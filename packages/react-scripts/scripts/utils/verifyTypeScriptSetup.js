@@ -255,6 +255,16 @@ function verifyTypeScriptSetup() {
       `/// <reference types="react-scripts" />${os.EOL}`
     );
   }
+
+  // Reference `react-scripts` types
+  if (!fs.existsSync(paths.appTypeDeclarations)) {
+    fs.writeFileSync(
+      paths.appTypeDeclarations,
+      // marcelabomfim-react-scripts start
+      `/// <reference types="marcelabomfim-react-scripts" />${os.EOL}`
+      // marcelabomfim-react-scripts end
+    );
+  }
 }
 
 module.exports = verifyTypeScriptSetup;

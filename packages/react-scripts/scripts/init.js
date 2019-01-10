@@ -23,6 +23,12 @@ const { defaultBrowsers } = require('react-dev-utils/browsersHelper');
 const os = require('os');
 const verifyTypeScriptSetup = require('./utils/verifyTypeScriptSetup');
 
+// marcelabomfim-react-scripts start
+function helloMarcelaBomfim() {
+  console.log(chalk.yellow('Hello from Marcela Bomfim!'));
+}
+// marcelabomfim-react-scripts end
+
 function isInGitRepository() {
   try {
     execSync('git rev-parse --is-inside-work-tree', { stdio: 'ignore' });
@@ -82,6 +88,10 @@ module.exports = function(
   originalDirectory,
   template
 ) {
+  // helloMarcelaBomfim start
+  helloMarcelaBomfim();
+  // helloMarcelaBomfim end
+
   const ownPath = path.dirname(
     require.resolve(path.join(__dirname, '..', 'package.json'))
   );
