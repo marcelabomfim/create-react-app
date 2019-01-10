@@ -1,14 +1,14 @@
 import React from 'react';
 
-import './Link.css';
+import StyledContainer from './Link.styles';
 
 export default ({ href, label }) => (
-  <a
+  <StyledContainer
     className="Link"
     href={href}
     target="_blank"
     rel="noopener noreferrer"
   >
     {label}
-  </a>
+  </StyledContainer>
 );
