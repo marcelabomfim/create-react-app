@@ -24,8 +24,51 @@ const os = require('os');
 const verifyTypeScriptSetup = require('./utils/verifyTypeScriptSetup');
 
 // marcelabomfim-react-scripts start
-function helloMarcelaBomfim() {
-  console.log(chalk.yellow('Hello from Marcela Bomfim!'));
+function dependenciesMarcelaBomfim(appPath) {
+  console.log();
+  console.log(
+    chalk.cyan('---------------------------------------------------')
+  );
+  console.log(chalk.cyan('Installing custom dependencies from Marcela Bomfim'));
+
+  const useYarn = fs.existsSync(path.join(appPath, 'yarn.lock'));
+  let command;
+  let args;
+
+  if (useYarn) {
+    command = 'yarnpkg';
+    args = ['add', '--silent'];
+  } else {
+    command = 'npm';
+    args = ['install', '--save', '--silent'];
+  }
+
+  args.push(
+    'styled-components',
+    'react-router-dom',
+    'redux',
+    'react-redux',
+    'redux-logger',
+    'redux-promise',
+    'redux-thunk'
+  );
+
+  console.log();
+  console.log('  used command:');
+  console.log(chalk.cyan(`    ${command} ${args.join(' ')}`));
+  console.log();
+
+  const proc = spawn.sync(command, args, { stdio: 'inherit' });
+  if (proc.status !== 0) {
+    console.error(`\`${command} ${args.join(' ')}\` failed`);
+    return;
+  }
+
+  console.log();
+  console.log(chalk.cyan(`The custom dependencies was successfully installed`));
+  console.log(
+    chalk.cyan('---------------------------------------------------')
+  );
 }
 // marcelabomfim-react-scripts end
 
@@ -88,10 +131,6 @@ module.exports = function(
   originalDirectory,
   template
 ) {
-  // helloMarcelaBomfim start
-  helloMarcelaBomfim();
-  // helloMarcelaBomfim end
-
   const ownPath = path.dirname(
     require.resolve(path.join(__dirname, '..', 'package.json'))
   );
@@ -208,6 +247,10 @@ module.exports = function(
   if (useTypeScript) {
     verifyTypeScriptSetup();
   }
+
+  // dependenciesMarcelaBomfim start
+  dependenciesMarcelaBomfim(appPath);
+  // dependenciesMarcelaBomfim end
 
   if (tryGitInit(appPath)) {
     console.log();
