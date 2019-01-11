@@ -23,55 +23,6 @@ const { defaultBrowsers } = require('react-dev-utils/browsersHelper');
 const os = require('os');
 const verifyTypeScriptSetup = require('./utils/verifyTypeScriptSetup');
 
-// marcelabomfim-react-scripts start
-function dependenciesMarcelaBomfim(appPath) {
-  console.log();
-  console.log(
-    chalk.cyan('---------------------------------------------------')
-  );
-  console.log(chalk.cyan('Installing custom dependencies from Marcela Bomfim'));
-
-  const useYarn = fs.existsSync(path.join(appPath, 'yarn.lock'));
-  let command;
-  let args;
-
-  if (useYarn) {
-    command = 'yarnpkg';
-    args = ['add', '--silent'];
-  } else {
-    command = 'npm';
-    args = ['install', '--save', '--silent'];
-  }
-
-  args.push(
-    'styled-components',
-    'react-router-dom',
-    'redux',
-    'react-redux',
-    'redux-logger',
-    'redux-promise',
-    'redux-thunk'
-  );
-
-  console.log();
-  console.log('  used command:');
-  console.log(chalk.cyan(`    ${command} ${args.join(' ')}`));
-  console.log();
-
-  const proc = spawn.sync(command, args, { stdio: 'inherit' });
-  if (proc.status !== 0) {
-    console.error(`\`${command} ${args.join(' ')}\` failed`);
-    return;
-  }
-
-  console.log();
-  console.log(chalk.cyan(`The custom dependencies was successfully installed`));
-  console.log(
-    chalk.cyan('---------------------------------------------------')
-  );
-}
-// marcelabomfim-react-scripts end
-
 function isInGitRepository() {
   try {
     execSync('git rev-parse --is-inside-work-tree', { stdio: 'ignore' });
@@ -148,6 +99,19 @@ module.exports = function(
     build: 'react-scripts build',
     test: 'react-scripts test',
     eject: 'react-scripts eject',
+  };
+
+  appPackage.husky = {
+    hooks: {
+      ['pre-commit']: 'lint-staged',
+    },
+  };
+
+  appPackage['lint-staged'] = {
+    ['src/**/*.{js,jsx,json,css}']: [
+      'prettier --single-quote --write',
+      'git add',
+    ],
   };
 
   // Setup the eslint config
@@ -248,14 +212,14 @@ module.exports = function(
     verifyTypeScriptSetup();
   }
 
-  // dependenciesMarcelaBomfim start
-  dependenciesMarcelaBomfim(appPath);
-  // dependenciesMarcelaBomfim end
-
   if (tryGitInit(appPath)) {
     console.log();
     console.log('Initialized a git repository.');
   }
+
+  // marcelabomfim-react-scripts start
+  customCommands(appPath);
+  // marcelabomfim-react-scripts end
 
   // Display the most elegant way to cd.
   // This needs to handle an undefined originalDirectory for
@@ -319,3 +283,61 @@ function isReactInstalled(appPackage) {
     typeof dependencies['react-dom'] !== 'undefined'
   );
 }
+
+// marcelabomfim-react-scripts start
+function installCustomDependencies(appPath, customDependencies, dev) {
+  const useYarn = fs.existsSync(path.join(appPath, 'yarn.lock'));
+  let command;
+  let args;
+
+  if (useYarn) {
+    command = 'yarnpkg';
+    args = ['add', '--silent', dev && '--dev'].filter(e => e);
+  } else {
+    command = 'npm';
+    args = ['install', '--silent', dev ? '--save-dev' : '--save'];
+  }
+
+  args = args.concat(customDependencies);
+
+  console.log();
+  console.log(`  ${dev ? 'dev' : 'app'} dependencies:`);
+  console.log(chalk.cyan(`    ${customDependencies.join(' ')}`));
+  console.log();
+
+  const proc = spawn.sync(command, args, { stdio: 'inherit' });
+  if (proc.status !== 0) {
+    console.error(`\`${command} ${args.join(' ')}\` failed`);
+    return;
+  }
+}
+
+function customCommands(appPath) {
+  const dependencies = [
+    'styled-components',
+    'react-router-dom',
+    'redux',
+    'react-redux',
+    'redux-logger',
+    'redux-promise',
+    'redux-thunk',
+  ];
+
+  const devDependencies = ['husky', 'lint-staged', 'prettier'];
+
+  console.log();
+  console.log(
+    chalk.cyan('---------------------------------------------------')
+  );
+  console.log(chalk.cyan('Installing custom dependencies from Marcela Bomfim'));
+
+  installCustomDependencies(appPath, dependencies, false);
+  installCustomDependencies(appPath, devDependencies, true);
+
+  console.log();
+  console.log(chalk.cyan(`The custom dependencies was successfully installed`));
+  console.log(
+    chalk.cyan('---------------------------------------------------')
+  );
+}
+// marcelabomfim-react-scripts end
